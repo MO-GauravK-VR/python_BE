@@ -18,6 +18,8 @@ class User(Base):
 
     # Relationships
     posts = relationship("Post", back_populates="author")
+    likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}')>"

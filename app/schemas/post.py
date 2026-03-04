@@ -17,11 +17,18 @@ class PollOptionCreate(BaseModel):
     option_text: str
 
 
+class MediaAttachment(BaseModel):
+    media_type: str       # "image" or "video"
+    file_url: str         # URL returned from /api/v1/media/upload
+    file_name: Optional[str] = None
+
+
 class CreatePostRequest(BaseModel):
     post_type: PostTypeEnum = PostTypeEnum.TEXT
     title: Optional[str] = None
     content: Optional[str] = None
-    poll_options: Optional[list[PollOptionCreate]] = None  # required when post_type is "poll"
+    media_urls: Optional[list[MediaAttachment]] = None       # for image/video posts
+    poll_options: Optional[list[PollOptionCreate]] = None     # for poll posts
 
     @field_validator("poll_options")
     @classmethod
@@ -73,6 +80,8 @@ class PostResponse(BaseModel):
     author: PostAuthor
     media: list[MediaResponse] = []
     poll_options: list[PollOptionResponse] = []
+    like_count: int = 0
+    comment_count: int = 0
     created_at: datetime
     updated_at: Optional[datetime] = None
 

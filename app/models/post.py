@@ -27,6 +27,16 @@ class Post(Base):
     author = relationship("User", back_populates="posts")
     media = relationship("PostMedia", back_populates="post", cascade="all, delete-orphan")
     poll_options = relationship("PollOption", back_populates="post", cascade="all, delete-orphan")
+    likes = relationship("Like", back_populates="post", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
+
+    @property
+    def like_count(self) -> int:
+        return len(self.likes) if self.likes else 0
+
+    @property
+    def comment_count(self) -> int:
+        return len(self.comments) if self.comments else 0
 
     def __repr__(self):
         return f"<Post(id={self.id}, type='{self.post_type}', title='{self.title}')>"

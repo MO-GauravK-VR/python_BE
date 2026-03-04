@@ -6,6 +6,7 @@ from app.api.v1.router import api_router
 from app.db.database import engine, Base
 from app.models import user  # noqa: F401 — ensure models are registered
 from app.models import post  # noqa: F401
+from app.models import interaction  # noqa: F401
 import os
 
 # Create all tables on startup

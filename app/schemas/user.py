@@ -51,3 +51,21 @@ class ProfileUpdateRequest(BaseModel):
 class ProfileResponse(BaseModel):
     message: str
     user: UserResponse
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+    reset_token: str  # In production, send this via email instead
+
+
+class ResetPasswordRequest(BaseModel):
+    reset_token: str
+    new_password: str
+
+
+class ResetPasswordResponse(BaseModel):
+    message: str

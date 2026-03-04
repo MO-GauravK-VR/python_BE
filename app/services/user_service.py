@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.user import User
 from app.schemas.user import UserSignUpRequest, LoginRequest, ProfileUpdateRequest
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import hash_password, verify_password, create_access_token, create_reset_token, verify_reset_token
 
 
 def create_user(db: Session, user_data: UserSignUpRequest) -> User:
@@ -66,3 +66,37 @@ def update_profile(db: Session, current_user: User, update_data: ProfileUpdateRe
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+def forgot_password(db: Session, email: str) -> str:
+    """Generate a password reset token for the given email."""
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found with this email.",
+        )
+
+    reset_token = create_reset_token(email=user.email)
+    # In production: send this token via email instead of returning it
+    return reset_token
+
+
+def reset_password(db: Session, token: str, new_password: str) -> None:
+    """Verify the reset token and update the user's password."""
+    email = verify_reset_token(token)
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token.",
+        )
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found.",
+        )
+
+    user.hashed_password = hash_password(new_password)
+    db.commit()

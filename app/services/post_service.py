@@ -27,6 +27,15 @@ def create_post(db: Session, post_data: CreatePostRequest, current_user: User) -
         author_id=current_user.id,
     )
 
+    # If image/video type, attach media URLs
+    if post_data.post_type in (PostTypeEnum.IMAGE, PostTypeEnum.VIDEO) and post_data.media_urls:
+        for media in post_data.media_urls:
+            new_post.media.append(PostMedia(
+                media_type=media.media_type,
+                file_url=media.file_url,
+                file_name=media.file_name,
+            ))
+
     # If poll type, add poll options
     if post_data.post_type == PostTypeEnum.POLL and post_data.poll_options:
         for option in post_data.poll_options:
