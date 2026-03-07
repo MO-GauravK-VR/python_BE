@@ -7,10 +7,20 @@ from app.db.database import engine, Base
 from app.models import user  # noqa: F401 — ensure models are registered
 from app.models import post  # noqa: F401
 from app.models import interaction  # noqa: F401
+from app.models import chat  # noqa: F401
+from app.services.chat_service import seed_default_rooms
+from app.db.database import SessionLocal
 import os
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
+
+# Seed default chat rooms (main, MI, CSK)
+_db = SessionLocal()
+try:
+    seed_default_rooms(_db)
+finally:
+    _db.close()
 
 # Ensure uploads directory exists
 os.makedirs("uploads/images", exist_ok=True)
